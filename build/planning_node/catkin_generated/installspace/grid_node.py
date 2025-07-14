@@ -4,7 +4,7 @@ import sensor_msgs.point_cloud2 as pc2
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import PointCloud2, PointField
 from geometry_msgs.msg import PoseStamped
-import std_msgs.msg
+from std_msgs.msg import Int32MultiArray, Header
 import numpy as np
 import hashlib
 
@@ -22,10 +22,13 @@ class GridNodePublisher:
         self.prev_grid_msg = None
         self.prev_a_star_msg = None
 
+        self.edge_msg = None
+        
         rospy.Subscriber("/state_estimation", Odometry, self.pose_callback)
         rospy.Subscriber("/traversable_area", PointCloud2, self.pc_callback)
         self.grid_pub = rospy.Publisher("/node_list", PointCloud2, queue_size=1)
         self.a_node_pub = rospy.Publisher("/a_node_list", PointCloud2, queue_size=1)
+        self.edge_pub = rospy.Publisher("/edge_list", Int32MultiArray, queue_size=1)
 
     def pose_callback(self, msg):
         if not self.received_pose:
@@ -53,6 +56,7 @@ class GridNodePublisher:
             if self.prev_grid_msg and self.prev_a_star_msg:
                 self.grid_pub.publish(self.prev_grid_msg)
                 self.a_node_pub.publish(self.prev_a_star_msg)
+                self.edge_pub.publish(self.edge_msg)
                 rospy.loginfo("Re-published cached node messages (no change in input).")
             return
 
@@ -80,6 +84,30 @@ class GridNodePublisher:
             if len(pts) >= self.min_points_per_grid:
                 mean_xyz = np.mean(np.array(pts), axis=0)
                 node_points.append(mean_xyz + self.origin)
+        
+        # edge 를 unique_grids의 grid key에 대해서 생성
+        edge_set = set()
+        keys = list(unique_grids.keys())  # 튜플 리스트
+        key_to_index = {key: idx for idx, key in enumerate(keys)}  # 빠른 lookup용 dict
+
+        for idx, key in enumerate(keys):
+            x, y = key
+
+            # 4방향 인접 (상하좌우) # 대각선 4개
+            neighbor_offsets = [(-1, 0), (1, 0), (0, -1), (0, 1), ] #(1, 1), (1, -1), (-1, -1), (-1, 1)
+
+            for dx, dy in neighbor_offsets:
+                neighbor_key = (x + dx, y + dy)
+                if neighbor_key in key_to_index:
+                    neighbor_idx = key_to_index[neighbor_key]
+                    edge = tuple(sorted((idx, neighbor_idx)))
+                    edge_set.add(edge)
+        
+        edge_list = list(edge_set)
+        # 중복 방지 용 set을 다시 list로 바꾸고 오름차순 정렬함
+        edge_list = [sorted(edge) for edge in edge_list]
+        edge_list = sorted(edge_list, key=lambda x: (x[0], x[1]))
+        flat_list = [i for edge in edge_list for i in edge] 
 
         unique_a_star_nodes = {}
         for idx, grid_idx in enumerate(a_star_node_indices):
@@ -87,7 +115,7 @@ class GridNodePublisher:
             if key not in unique_a_star_nodes:
                 unique_a_star_nodes[key] = []
             unique_a_star_nodes[key].append(points[idx])
-
+        
         a_star_node_points = []
         for pts in unique_a_star_nodes.values():
             if len(pts) >= self.min_points_per_grid:
@@ -99,7 +127,7 @@ class GridNodePublisher:
             return
 
         # 메시지 생성
-        header = std_msgs.msg.Header()
+        header = Header()
         header.stamp = rospy.Time.now()
         header.frame_id = msg.header.frame_id
 
@@ -111,15 +139,20 @@ class GridNodePublisher:
 
         grid_msg = pc2.create_cloud(header, fields, node_points)
         a_star_msg = pc2.create_cloud(header, fields, a_star_node_points)
-
+        
+        edge_msg = Int32MultiArray()
+        edge_msg.data = flat_list
+        self.edge_pub.publish(edge_msg)
         # publish 및 저장
         self.grid_pub.publish(grid_msg)
         self.a_node_pub.publish(a_star_msg)
         self.prev_grid_msg = grid_msg
         self.prev_a_star_msg = a_star_msg
         self.prev_pc_hash = current_hash
+        self.edge_msg = edge_msg
 
         rospy.loginfo(f"Published {len(node_points)} grid node(s), {len(a_star_node_points)} a-star node(s).")
+        rospy.loginfo(f"Published {len(flat_list)//2} edge(s).")
 
 if __name__ == '__main__':
     try:
