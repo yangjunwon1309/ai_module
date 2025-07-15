@@ -56,3 +56,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/planning_node" TYPE PROGRAM FILES "/home/junwon/CMU-VLA-Challenge/ai_module/build/planning_node/catkin_generated/installspace/grid_node.py")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/planning_node" TYPE PROGRAM FILES "/home/junwon/CMU-VLA-Challenge/ai_module/build/planning_node/catkin_generated/installspace/a_start_node.py")
+endif()
+
