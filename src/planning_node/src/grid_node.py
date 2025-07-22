@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 import sensor_msgs.point_cloud2 as pc2
 from nav_msgs.msg import Odometry

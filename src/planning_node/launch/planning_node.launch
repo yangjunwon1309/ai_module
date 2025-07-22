@@ -1,0 +1,16 @@
+<launch>
+    <!-- Grid Node -->
+    <node pkg="planning_node" type="grid_node.py" name="grid_node" output="screen">
+        <param name="use_sim_time" value="false"/>
+    </node>
+
+    <!-- A* Node -->
+    <node pkg="planning_node" type="a_star_node.py" name="a_star_node" output="screen">
+        <param name="use_sim_time" value="false"/>
+    </node>
+
+    <!-- TSP Node -->
+    <node pkg="planning_node" type="tsp_node.py" name="tsp_node" output="screen">
+        <param name="use_sim_time" value="false"/>
+    </node>
+</launch>

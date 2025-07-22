@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 import sensor_msgs.point_cloud2 as pc2
 from nav_msgs.msg import Odometry
@@ -7,6 +7,8 @@ from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Int32MultiArray, Header, String, Float32
 import numpy as np
 import hashlib, struct
+import pickle
+import os
 
 class AStarNodePublisher:
     def __init__(self):
@@ -21,15 +23,40 @@ class AStarNodePublisher:
         self.received_pose = False
         self.origin = None
 
+        self.new_data = True
+
         self.edge_list = None
         self.edge_dict = {}
         self.selected_edge_key = None
         self.nodes = None
         self.a_nodes = None
         self.prev_edge_hash = None
+        self.a_nodes_penalty = None
+        self.a_star_node_size = rospy.get_param("~a_star_node_size", 0.2)
 
         self.route_pub = rospy.Publisher("/route_for_key", PointCloud2, queue_size=1)
         self.dis_pub = rospy.Publisher("/dis_for_key", Float32, queue_size=1)
+        self.mode_pub = rospy.Publisher("/mode", String, queue_size=1)
+    
+    def save_edge_dict(self, edge_dict, filename='edge_data.pkl'):
+        edge_routes = {}
+        edge_distances = {}
+
+        for key, val in edge_dict.items():
+            #key_ = tuple(key)
+            if val['route']:  # route가 비어있지 않은 경우만 저장
+                edge_routes[key] = val['route']  # key는 (i, j)
+                edge_distances[key] = val['dis']
+        
+        data = {
+            'routes': edge_routes,
+            'distances': edge_distances
+        }
+        os.makedirs("data", exist_ok=True)
+        with open(f'data/{filename}', 'wb') as f:
+            pickle.dump(data, f)
+
+        print(f"[INFO] Saved {len(edge_routes)} edge routes to {filename}")
 
     def pose_callback(self, msg):
         if not self.received_pose:
@@ -85,7 +112,12 @@ class AStarNodePublisher:
         current_hash = self.hash_list(msg)
         if current_hash == self.prev_edge_hash:
             rospy.loginfo("Same edge_list received. Skipping A* computation.")
+            msg = String()
+            msg.data = "tsp"
+            self.mode_pub.publish(msg)
+            self.new_data = False
             return
+        self.new_data = True
         self.prev_edge_hash = current_hash
 
         data = msg.data
@@ -95,15 +127,35 @@ class AStarNodePublisher:
             dis, route = self.a_star_compute(edge)
             self.edge_dict[str(edge)] = {'dis': dis, 'route': route}
             rospy.loginfo(f"Computed edge {edge} with distance {dis} and route length {len(route)}")
+        
+        self.save_edge_dict(self.edge_dict)
     
     def node_callback(self, msg):
-        self.nodes = list(pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True))
+        if self.new_data :
+            self.nodes = list(pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True))
 
     def a_node_callback(self, msg):
-        self.a_nodes = list(pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True))
+        if self.new_data :
+            self.a_nodes = list(pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True))
+            self.a_nodes_penalty = [0] * len(self.a_nodes)
+            for idx, node in enumerate(self.a_nodes):
+                node_mean =  tuple(np.round(np.array(node[:2]) / self.a_star_node_size) * self.a_star_node_size)
+                neighbor_list = self.get_neighbors(tuple(node))
+                if len(neighbor_list) == 0:
+                    edge_penalty = float('inf')
+                    skew_penalty = float('inf')
+                else:
+                    edge_penalty = (4 / len(neighbor_list))
+                    skew_penalty = 0
+                    # if len(neighbor_list) == 4:
+                    #     for neightbor in neighbor_list : 
+                    #         skew_penalty += np.abs(np.linalg.norm(np.array(neightbor[:2]) - np.array(node[:2])))
+                    
+                self.a_nodes_penalty[idx] = edge_penalty + skew_penalty
 
     def heuristic(self, p1, p2):
-        return np.linalg.norm(np.array(p1) - np.array(p2))
+        p1_idx = next((i for i, n in enumerate(self.a_nodes) if tuple(n) == p1), 0)
+        return np.linalg.norm(np.array(p1) - np.array(p2)) + self.a_nodes_penalty[p1_idx]
 
     def a_star_compute(self, edge):
         if not self.nodes or not self.a_nodes:
@@ -155,7 +207,7 @@ class AStarNodePublisher:
 
         return float('inf'), []
     
-    def get_neighbors(self, current, threshold=0.25):
+    def get_neighbors(self, current, threshold=0.22):
         neighbors = []
         for i, n in enumerate(self.a_nodes):
             if tuple(n) == current:
