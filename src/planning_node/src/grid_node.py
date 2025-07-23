@@ -12,7 +12,7 @@ class GridNodePublisher:
     def __init__(self):
         rospy.init_node('grid_node_publisher')
         self.grid_size = rospy.get_param("~grid_size", 2.0)  # in meters
-        self.a_star_node_size = rospy.get_param("~a_star_node_size", 0.2) 
+        self.a_star_node_size = rospy.get_param("~a_star_node_size", 0.5) 
         self.min_points_per_grid = rospy.get_param("~min_points", 1)
 
         self.origin = np.array([0.0, 0.0, 0.0])
@@ -57,7 +57,7 @@ class GridNodePublisher:
                 self.grid_pub.publish(self.prev_grid_msg)
                 self.a_node_pub.publish(self.prev_a_star_msg)
                 self.edge_pub.publish(self.edge_msg)
-                rospy.loginfo("Re-published cached node messages (no change in input).")
+                #rospy.loginfo("Re-published cached node messages (no change in input).")
             return
 
         # 새로운 PointCloud -> 계산 수행

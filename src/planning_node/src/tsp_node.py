@@ -3,6 +3,8 @@ import rospy
 import pickle
 import networkx as nx
 import heapq
+import sensor_msgs.point_cloud2 as pc2
+from sensor_msgs.msg import PointCloud2, PointField
 from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Point
 from std_msgs.msg import String, Int32MultiArray
@@ -10,19 +12,20 @@ import hashlib, struct
 
 def prim_mst_edges(G, nodes):
     N = len(nodes)
-    idx_to_node = {i: n for i, n in enumerate(nodes)}
-    node_to_idx = {n: i for i, n in enumerate(nodes)}
 
     visited = [False] * N
     hq = []
     mst_edges = []
 
+    # 가장 많이 연결되어 있는 노드 중 가장 앞에 정렬되어 있는 것을 정점으로 선택
+    
     visited[0] = True
     for j in range(N):
         if G.has_edge(nodes[0], nodes[j]):
             w = G[nodes[0]][nodes[j]]['weight']
             heapq.heappush(hq, (w, 0, j))
-
+    
+    # 가장 작은 간선 가중치 (거리)를 가진 v를 뽑아서 visited 에 추가, v에서의 연결된 간선도 heapq에 추가해서 반복
     while hq:
         w, u, v = heapq.heappop(hq)
         if visited[v]:
@@ -46,9 +49,11 @@ class MSTVisualizer:
         self.edge_routes = None
         self.largest = None
         self.mst_edges = None
+        self.nodes = None
 
         self.prev_edge_hash = None
 
+        rospy.Subscriber("/node_list", PointCloud2, self.node_callback)
         rospy.Subscriber("/mode", String, self.mode_callback)
         rospy.Subscriber("/edge_list", Int32MultiArray, self.list_callback)
         rospy.loginfo("Waiting for /mode == 'tsp'...")
@@ -60,6 +65,10 @@ class MSTVisualizer:
         packed = struct.pack(f'{len(msg.data)}i', *msg.data)
         return hashlib.md5(packed).hexdigest()
     
+    def node_callback(self, msg):
+        if not self.triggered :
+            self.nodes = list(pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True))
+
     def list_callback(self, msg):
         current_hash = self.hash_list(msg)
         if current_hash == self.prev_edge_hash:
@@ -83,9 +92,6 @@ class MSTVisualizer:
             with open(f'data/{filename}', 'rb') as f:
                 data = pickle.load(f)
             
-            #self.edge_routes = data['routes']
-            #edge_distances = data['distances']
-            
             self.edge_routes = {
                 eval(k): v for k, v in data['routes'].items()
             }
@@ -93,14 +99,8 @@ class MSTVisualizer:
                 eval(k): v for k, v in data['distances'].items()
             }
 
-            rospy.loginfo(f"Loaded {len(self.edge_routes)} edge routes from {filename}")
-
-            nodes = set()
-            for (i, j) in self.edge_routes:
-                nodes.add(i)
-                nodes.add(j)
-            nodes = sorted(list(nodes))
-
+            #rospy.loginfo(f"Loaded {len(self.edge_routes)} edge routes from {filename}")
+            
             self.G = nx.Graph()
             for (i, j), route in self.edge_routes.items():
                 if route:
@@ -123,7 +123,7 @@ class MSTVisualizer:
         if self.mst_edges is None:
             return
 
-        print(f"MST edge 개수: {len(self.mst_edges)}")
+        #print(f"MST edge 개수: {len(self.mst_edges)}")
 
         marker = Marker()
         marker.header.frame_id = "map"
@@ -139,17 +139,14 @@ class MSTVisualizer:
         marker.color.a = 1.0
 
         for u, v in self.mst_edges:
-            pts_uv = self.edge_routes.get((u, v), [])
-            if not pts_uv and self.edge_routes.get((v, u), []):
-                pts_uv = list(reversed(self.edge_routes[(v, u)]))
-
-            if pts_uv:
-                start = pts_uv[0]
-                end = pts_uv[-1]
+            start = self.nodes[u]
+            end = self.nodes[v]
+            
+            try:
                 marker.points.append(Point(x=start[0], y=start[1], z=start[2]))
                 marker.points.append(Point(x=end[0], y=end[1], z=end[2]))
-            else:
-                rospy.logwarn(f"No route for edge {u} <-> {v}")
+            except Exception as e:
+                rospy.logwarn(f"No route for edge {u} <-> {v}, error as {e}")
         
         self.marker_pub.publish(marker)
 

@@ -32,8 +32,9 @@ class AStarNodePublisher:
         self.a_nodes = None
         self.prev_edge_hash = None
         self.a_nodes_penalty = None
-        self.a_star_node_size = rospy.get_param("~a_star_node_size", 0.2)
-
+        self.a_star_node_size = rospy.get_param("~a_star_node_size", 0.5)
+        self.a_threshold = self.a_star_node_size + 0.05
+        
         self.route_pub = rospy.Publisher("/route_for_key", PointCloud2, queue_size=1)
         self.dis_pub = rospy.Publisher("/dis_for_key", Float32, queue_size=1)
         self.mode_pub = rospy.Publisher("/mode", String, queue_size=1)
@@ -111,7 +112,7 @@ class AStarNodePublisher:
     def list_callback(self, msg):
         current_hash = self.hash_list(msg)
         if current_hash == self.prev_edge_hash:
-            rospy.loginfo("Same edge_list received. Skipping A* computation.")
+            #rospy.loginfo("Same edge_list received. Skipping A* computation.")
             msg = String()
             msg.data = "tsp"
             self.mode_pub.publish(msg)
@@ -155,8 +156,17 @@ class AStarNodePublisher:
 
     def heuristic(self, p1, p2):
         p1_idx = next((i for i, n in enumerate(self.a_nodes) if tuple(n) == p1), 0)
-        return np.linalg.norm(np.array(p1) - np.array(p2)) + self.a_nodes_penalty[p1_idx]
-
+        return 1.5*np.linalg.norm(np.array(p1) - np.array(p2)) + self.a_nodes_penalty[p1_idx]
+    
+    def direction_change_penalty(self, current, neighbor, came_from):
+        prev = came_from.get(current)
+        if prev is None:
+            return 0.0
+        v1 = np.array(current) - np.array(prev)
+        v2 = np.array(neighbor) - np.array(current)
+        cos_angle = np.dot(v1, v2) / (np.linalg.norm(v1)*np.linalg.norm(v2) + 1e-6)
+        return np.arccos(np.clip(cos_angle, -1.0, 1.0))
+        
     def a_star_compute(self, edge):
         if not self.nodes or not self.a_nodes:
             return float('inf'), []
@@ -170,15 +180,14 @@ class AStarNodePublisher:
 
         start = tuple(a_nodes_np[start_idx])
         goal = tuple(a_nodes_np[goal_idx])
-
+        
         open_set = {start}
         came_from = {}
         g_score = {start: 0}
         f_score = {start: self.heuristic(start, goal)}
-
+        
         visited = set()
         
-
         while open_set:
             current = min(open_set, key=lambda x: f_score.get(x, float('inf')))
             if current == goal:
@@ -202,18 +211,18 @@ class AStarNodePublisher:
                 if tentative_g < g_score.get(neighbor, float('inf')):
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g
-                    f_score[neighbor] = tentative_g + self.heuristic(neighbor, goal)
+                    f_score[neighbor] = tentative_g + self.heuristic(neighbor, goal) + 0.3*self.direction_change_penalty(current, neighbor, came_from)
                     open_set.add(neighbor)
 
         return float('inf'), []
     
-    def get_neighbors(self, current, threshold=0.22):
+    def get_neighbors(self, current):
         neighbors = []
         for i, n in enumerate(self.a_nodes):
             if tuple(n) == current:
                 continue
             diff = np.abs(np.array(current[:2]) - np.array(n[:2]))
-            if max(diff[0], diff[1]) <= threshold:
+            if max(diff[0], diff[1]) <= self.a_threshold:
                 neighbors.append(tuple(n))
         return neighbors
 

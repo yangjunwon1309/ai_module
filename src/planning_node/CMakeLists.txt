@@ -164,6 +164,7 @@ catkin_install_python(PROGRAMS
    src/grid_node.py
    src/a_star_node.py
    src/tsp_node.py
+   src/explore_node.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
