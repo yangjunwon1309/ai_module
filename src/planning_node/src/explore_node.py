@@ -10,7 +10,7 @@ from geometry_msgs.msg import Point, Pose2D
 from std_msgs.msg import String, Int32MultiArray
 import hashlib, struct
 from collections import defaultdict
-import subprocess
+import subprocess, signal
 import os
 
 class ExplorationNode:
