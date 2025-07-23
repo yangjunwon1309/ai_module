@@ -10,6 +10,8 @@ from geometry_msgs.msg import Point, Pose2D
 from std_msgs.msg import String, Int32MultiArray
 import hashlib, struct
 from collections import defaultdict
+import subprocess
+import os
 
 class ExplorationNode:
     def __init__(self):
@@ -35,6 +37,9 @@ class ExplorationNode:
         self.route_idx = 0
 
         self.dis_ths = 0.45
+        
+        self.bag_process = None
+        self.explore_stop = False
 
         rospy.Subscriber("/state_estimation", Odometry, self.pose_callback)
         rospy.Subscriber("/mst_edges_marker", Marker, self.mst_callback)
@@ -49,7 +54,8 @@ class ExplorationNode:
         rospy.loginfo("Exploration node initialized. Listening to /mst_edges_marker")
     
     def timer_callback(self, event):
-        self.waypoint_planning()
+        if not self.explore_stop:
+            self.waypoint_planning()
 
     def node_callback(self, msg):
         if self.new_data :
@@ -132,6 +138,7 @@ class ExplorationNode:
 
                 # MST에서 정점 중심으로 한 방향의 간선만 추가
                 self.graph[self.node_idx(p1)].append(self.node_idx(p2))
+                self.graph[self.node_idx(p2)].append(self.node_idx(p1))
         
         if len(self.node_to_travel) < 1:
             self.explore_with_mst()
@@ -201,6 +208,8 @@ class ExplorationNode:
             else:
                 self.cur_node_idx = self.node_to_travel.pop(0)
                 self.next_node_idx = self.node_to_travel[0]
+                # rosbag record start as below code
+                self.start_recording('whole_0.bag')
                 rospy.logwarn("initial node arrived, send waypoint following MST")
         
         else:
@@ -241,8 +250,28 @@ class ExplorationNode:
                             rospy.logwarn(f"{self.cur_node_idx} node reached! move to {self.next_node_idx} node")
                         else :
                             self.cur_node_idx = self.node_to_travel.pop(0)
+                            # rosbag record stop as below code
+                            self.stop_recording()
+                            self.explore_stop = True
                             rospy.logwarn("all nodes reached! arrived at initial root node")
+    
+    def start_recording(self, filename='whole_0.bag'):
+        
+        bag_dir = os.path.join(os.path.dirname(__file__), 'data')
+        os.makedirs(bag_dir, exist_ok=True)
+        filepath = os.path.join(bag_dir, filename)
 
+        topics = ['/camera/image/compressed', '/state_estimation', '/object_markers']
+        command = ['rosbag', 'record', '-O', filepath] + topics
+        self.bag_process = subprocess.Popen(command) #, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        rospy.loginfo("rosbag recording started.")
+    
+    def stop_recording(self):
+        if self.bag_process:
+            self.bag_process.send_signal(signal.SIGINT)
+            self.bag_process.wait()
+            rospy.loginfo("rosbag recording stopped.")
+    
     def run(self):
         rospy.spin()
 
