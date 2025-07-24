@@ -16,7 +16,7 @@ class GridNodePublisher:
         self.min_points_per_grid = rospy.get_param("~min_points", 400)
 
         self.origin = np.array([0.0, 0.0, 0.0])
-        self.received_pose = FalseSS
+        self.received_pose = False
         
         self.prev_pc_hash = None
         self.prev_grid_msg = None
