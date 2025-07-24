@@ -32,7 +32,7 @@ class GridNodePublisher:
         self.a_node_pub = rospy.Publisher("/a_node_list", PointCloud2, queue_size=1)
         self.edge_pub = rospy.Publisher("/edge_list", Int32MultiArray, queue_size=1)
         self.received_pose = False
-        
+
     def pose_callback(self, msg):
         if not self.received_pose:
             self.origin = np.array([
@@ -87,7 +87,7 @@ class GridNodePublisher:
             if len(pts) >= self.min_points_per_grid:
                 mean_xyz = np.mean(np.array(pts), axis=0)
                 close_pts = [pt for pt in pts if np.linalg.norm(pt - mean_xyz) < 0.3]
-                if len(close_pts) > 30 :
+                if len(close_pts) > 0 :
                     node_points.append(mean_xyz + self.origin)
         
         # edge 를 unique_grids의 grid key에 대해서 생성
