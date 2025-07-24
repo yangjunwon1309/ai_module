@@ -13,10 +13,10 @@ class GridNodePublisher:
         rospy.init_node('grid_node_publisher')
         self.grid_size = rospy.get_param("~grid_size", 2.0)  # in meters
         self.a_star_node_size = rospy.get_param("~a_star_node_size", 0.5) 
-        self.min_points_per_grid = rospy.get_param("~min_points", 1)
+        self.min_points_per_grid = rospy.get_param("~min_points", 400)
 
         self.origin = np.array([0.0, 0.0, 0.0])
-        self.received_pose = False
+        self.received_pose = FalseSS
         
         self.prev_pc_hash = None
         self.prev_grid_msg = None
@@ -83,7 +83,9 @@ class GridNodePublisher:
         for pts in unique_grids.values():
             if len(pts) >= self.min_points_per_grid:
                 mean_xyz = np.mean(np.array(pts), axis=0)
-                node_points.append(mean_xyz + self.origin)
+                close_pts = [pt for pt if np.linalg.norm(pt - mean_xyz) < 0.3]
+                if len(close_pts) > 30 :
+                    node_points.append(mean_xyz + self.origin)
         
         # edge 를 unique_grids의 grid key에 대해서 생성
         edge_set = set()
