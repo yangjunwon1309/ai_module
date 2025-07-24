@@ -83,7 +83,7 @@ class GridNodePublisher:
         for pts in unique_grids.values():
             if len(pts) >= self.min_points_per_grid:
                 mean_xyz = np.mean(np.array(pts), axis=0)
-                close_pts = [pt for pt if np.linalg.norm(pt - mean_xyz) < 0.3]
+                close_pts = [pt for pt in pts if np.linalg.norm(pt - mean_xyz) < 0.3]
                 if len(close_pts) > 30 :
                     node_points.append(mean_xyz + self.origin)
         
