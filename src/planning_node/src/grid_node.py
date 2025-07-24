@@ -16,8 +16,10 @@ class GridNodePublisher:
         self.min_points_per_grid = rospy.get_param("~min_points", 400)
 
         self.origin = np.array([0.0, 0.0, 0.0])
-        self.received_pose = False
         
+        
+        self.received_pose = False
+
         self.prev_pc_hash = None
         self.prev_grid_msg = None
         self.prev_a_star_msg = None
@@ -29,7 +31,8 @@ class GridNodePublisher:
         self.grid_pub = rospy.Publisher("/node_list", PointCloud2, queue_size=1)
         self.a_node_pub = rospy.Publisher("/a_node_list", PointCloud2, queue_size=1)
         self.edge_pub = rospy.Publisher("/edge_list", Int32MultiArray, queue_size=1)
-
+        self.received_pose = False
+        
     def pose_callback(self, msg):
         if not self.received_pose:
             self.origin = np.array([
