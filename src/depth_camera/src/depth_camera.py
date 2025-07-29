@@ -74,7 +74,7 @@ if __name__ == "__main__":
     tf_buffer = tf2_ros.Buffer()
     tf_listener = tf2_ros.TransformListener(tf_buffer)
 
-    rospy.Subscriber("/sensor_scan", PointCloud2, pointcloud_callback)
+    rospy.Subscriber("/registered_scan", PointCloud2, pointcloud_callback)
     depth_pub = rospy.Publisher("/depth_image", Image, queue_size=1)
 
     rospy.spin()
