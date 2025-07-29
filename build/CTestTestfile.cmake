@@ -7,3 +7,4 @@
 subdirs("gtest")
 subdirs("dummy_vlm")
 subdirs("planning_node")
+subdirs("depth_camera")

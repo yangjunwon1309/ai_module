@@ -148,6 +148,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/home/junwon/CMU-VLA-Challenge/ai_module/build/gtest/cmake_install.cmake")
   include("/home/junwon/CMU-VLA-Challenge/ai_module/build/dummy_vlm/cmake_install.cmake")
   include("/home/junwon/CMU-VLA-Challenge/ai_module/build/planning_node/cmake_install.cmake")
+  include("/home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/cmake_install.cmake")
 
 endif()
 
