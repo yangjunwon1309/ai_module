@@ -13,6 +13,10 @@ fx = 305.6
 fy = 305.6
 cx = 960.0
 cy = 320.0
+
+HFOV = 2 * np.pi
+VFOV = np.deg2rad(120.0)
+
 image_width = 1920
 image_height = 640
 
@@ -41,11 +45,15 @@ def pointcloud_callback(msg):
 
             if Z <= 0.1 or Z > 200.0:  # Ignore invalid ranges
                 continue
+            
+            r = np.sqrt(X**2 + Y**2 + Z**2)
+            theta = np.arctan2(Y, X)   # [-π, π] - 수평각
+            phi   = np.arcsin(Z / r)
 
             # Project to image plane
-            u = int(fx * X / Z + cx)
-            v = int(fy * Y / Z + cy)
-
+            u = int((theta + np.pi) / HFOV * image_width)
+            v = int((np.pi/2 - phi) / VFOV * image_height)
+            
             if 0 <= u < image_width and 0 <= v < image_height:
                 # Use nearest Z (smallest depth)
                 if depth_image[v, u] == 0 or Z < depth_image[v, u]:
