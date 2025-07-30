@@ -12,18 +12,28 @@ import os
 
 bridge = CvBridge()
 
-rp = rospkg.RosPack()
-pkg_path = rp.get_path("depth_camera")  # 또는 "depth_projector_pkg" 등 실제 패키지 이름
-so_path = os.path.join(pkg_path, "../..", "devel", "lib", "libdepth_projector.so")
-so_path = os.path.abspath(so_path)
 
-print("Loading:", so_path)
 try:
+    rp = rospkg.RosPack()
+    pkg_path = rp.get_path("depth_camera")  # 또는 "depth_projector_pkg" 등 실제 패키지 이름
+    so_path = os.path.join(pkg_path, "../..", "devel", "lib", "libdepth_projector.so")
+    so_path = os.path.abspath(so_path)
+
+    print("Loading:", so_path)
     depth_projector = ctypes.CDLL(so_path)
     depth_projector.project_lidar_to_depth.restype = None
     print("loading success")
 except Exception as e:
-    print(f"loding failed as {e}")
+    try:
+        print(f"loding failed as {e}, retrying load the library")
+        so_path = os.path.join(pkg_path, "../../../devel/lib/libdepth_projector.so")
+        so_path = os.path.abspath(so_path)
+        print("Loading:", so_path)
+        depth_projector = ctypes.CDLL(so_path)
+        depth_projector.project_lidar_to_depth.restype = None
+        print("loading success")
+    except Exception as e2 :
+        print(f"loding failed as {e2}..")
 
 # Buffers
 stack_num = 400
