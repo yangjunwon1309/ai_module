@@ -26,7 +26,7 @@ try:
 except Exception as e:
     try:
         print(f"loding failed as {e}, retrying load the library")
-        so_path = os.path.join(pkg_path, "../../../devel/lib/libdepth_projector.so")
+        so_path = os.path.join(pkg_path, "../../../../../devel/lib/libdepth_projector.so")
         so_path = os.path.abspath(so_path)
         print("Loading:", so_path)
         depth_projector = ctypes.CDLL(so_path)
