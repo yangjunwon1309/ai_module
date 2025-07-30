@@ -9,6 +9,8 @@ import tf
 from sensor_msgs import point_cloud2
 import ctypes, rospkg
 import os
+import cv2
+
 
 bridge = CvBridge()
 
@@ -75,6 +77,19 @@ def laser_handler(msg):
     laser_cloud = list(point_cloud2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True))
     new_laser_cloud = True
 
+def visualize_depth_overlay(rgb_image, depth_image):
+    if np.max(depth_image) == 0:
+        return rgb_image  # depth가 없으면 그대로 반환
+    depth_mask = depth_image > 0
+    depth_colormap = cv2.applyColorMap(
+        cv2.convertScaleAbs(depth_image, alpha=255.0 / np.max(depth_image)), cv2.COLORMAP_JET
+    )
+    overlay = rgb_image.copy()
+    overlay[depth_mask] = cv2.addWeighted(rgb_image[depth_mask], 0.5, depth_colormap[depth_mask], 0.5, 0)
+    return overlay
+
+semantic_pub = None
+
 def process():
     global image_id_pointer, new_laser_cloud
     if not image_init or not new_laser_cloud:
@@ -130,7 +145,14 @@ def process():
     msg.header.stamp = rospy.Time.from_sec(laser_cloud_time)
     msg.header.frame_id = "camera"
     depth_pub.publish(msg)
-    print(f"publish success {np.sum(np.abs(depth_image - before))}")
+
+    overlay_image = visualize_depth_overlay(seg_image_cv, depth_image)
+    overlay_msg = bridge.cv2_to_imgmsg(overlay_image, encoding="bgr8")
+    overlay_msg.header.stamp = rospy.Time.from_sec(laser_cloud_time)
+    overlay_msg.header.frame_id = "camera"
+    semantic_pub.publish(overlay_msg)
+
+    print(f"publish success ") #{np.sum(np.abs(depth_image - before))}
 
 def main():
     global depth_pub, camera_offset_z
@@ -141,6 +163,7 @@ def main():
     rospy.Subscriber("/camera/image", Image, image_handler, queue_size=2)
     rospy.Subscriber("/registered_scan", PointCloud2, laser_handler, queue_size=2)
     depth_pub = rospy.Publisher("/depth_image", Image, queue_size=1)
+    semantic_pub = rospy.Publisher("/semantic_depth_image", Image, queue_size=1)
 
     rate = rospy.Rate(200)
 
