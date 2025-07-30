@@ -50,6 +50,7 @@ new_laser_cloud = False
 laser_cloud = []
 seg_image_cv = None
 depth_pub = None
+semantic_pub = None
 camera_offset_z = 0.0
 
 def odom_handler(msg):
@@ -87,8 +88,6 @@ def visualize_depth_overlay(rgb_image, depth_image):
     overlay = rgb_image.copy()
     overlay[depth_mask] = cv2.addWeighted(rgb_image[depth_mask], 0.5, depth_colormap[depth_mask], 0.5, 0)
     return overlay
-
-semantic_pub = None
 
 def process():
     global image_id_pointer, new_laser_cloud
@@ -155,7 +154,7 @@ def process():
     print(f"publish success ") #{np.sum(np.abs(depth_image - before))}
 
 def main():
-    global depth_pub, camera_offset_z
+    global depth_pub, semantic_pub, camera_offset_z
     rospy.init_node("depth_projector_py")
     camera_offset_z = rospy.get_param("~cameraOffsetZ", 0.0)
 
