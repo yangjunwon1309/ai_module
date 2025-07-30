@@ -25,9 +25,11 @@ bridge = CvBridge()
 def pointcloud_callback(msg):
     try:
         # Transform from LiDAR frame (e.g., sensor_at_scan) to camera frame
-        transform = tf_buffer.lookup_transform(
-            "camera", msg.header.frame_id, rospy.Time(0), rospy.Duration(1.0)
-        )
+        try:
+            transform = tf_buffer.lookup_transform("map", "camera", msg.header.stamp, rospy.Duration(1.0))
+        except (tf2_ros.LookupException, tf2_ros.ExtrapolationException, tf2_ros.ConnectivityException) as e:
+            rospy.logwarn("TF transform failed: {}".format(e))
+            return
 
         # Create empty depth image
         depth_image = np.zeros((image_height, image_width), dtype=np.float32)
@@ -53,7 +55,7 @@ def pointcloud_callback(msg):
             # Project to image plane
             u = int((theta + np.pi) / HFOV * image_width)
             v = int((np.pi/2 - phi) / VFOV * image_height)
-            
+
             if 0 <= u < image_width and 0 <= v < image_height:
                 # Use nearest Z (smallest depth)
                 if depth_image[v, u] == 0 or Z < depth_image[v, u]:

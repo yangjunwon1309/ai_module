@@ -208,8 +208,8 @@ class ExplorationNode:
             else:
                 self.cur_node_idx = self.node_to_travel.pop(0)
                 self.next_node_idx = self.node_to_travel[0]
-                # rosbag record start as below code
-                self.start_recording('whole_0.bag')
+                # rosbag record start as below code (entire route)
+                self.start_recording(f'{self.cur_node_idx}.bag')
                 rospy.logwarn("initial node arrived, send waypoint following MST")
         
         else:
@@ -241,7 +241,10 @@ class ExplorationNode:
                 
                 else:
                     self.route_idx += 1
-                    
+                    if self.route_idx == 3:
+                        self.stop_recording()
+                    if self.route_idx == len(route_cn) - 4 :
+                        self.start_recording(f'{self.next_node_idx}.bag')
                     if self.route_idx >= len(route_cn) :
                         self.route_idx = 0
                         if len(self.node_to_travel) > 1 :
@@ -250,7 +253,7 @@ class ExplorationNode:
                             rospy.logwarn(f"{self.cur_node_idx} node reached! move to {self.next_node_idx} node")
                         else :
                             self.cur_node_idx = self.node_to_travel.pop(0)
-                            # rosbag record stop as below code
+                            # rosbag record stop as below code (entire route)
                             self.stop_recording()
                             self.explore_stop = True
                             rospy.logwarn("all nodes reached! arrived at initial root node")
@@ -261,7 +264,7 @@ class ExplorationNode:
         os.makedirs(bag_dir, exist_ok=True)
         filepath = os.path.join(bag_dir, filename)
 
-        topics = ['/camera/image/compressed', '/state_estimation', '/object_markers']
+        topics = ['/camera/image/compressed', '/state_estimation', '/object_markers', '/registered_scan']
         command = ['rosbag', 'record', '-O', filepath] + topics
         self.bag_process = subprocess.Popen(command) #, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         rospy.loginfo("rosbag recording started.")
