@@ -241,9 +241,9 @@ class ExplorationNode:
                 
                 else:
                     self.route_idx += 1
-                    if self.route_idx == 3:
+                    if self.route_idx == 1:
                         self.stop_recording()
-                    if self.route_idx == len(route_cn) - 4 :
+                    if self.route_idx == len(route_cn) - 2 :
                         self.start_recording(f'{self.next_node_idx}.bag')
                     if self.route_idx >= len(route_cn) :
                         self.route_idx = 0
