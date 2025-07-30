@@ -43,7 +43,7 @@ extern "C" void project_lidar_to_depth(
         if (hori_dis < 1e-5f) continue;
 
         int u = (int)(-image_width / (2 * M_PI) * atan2f(y4, x4) + image_width / 2);
-        int v = (int)(-image_height / (2 * M_PI) * atanf(z4 / hori_dis) + image_height / 2);
+        int v = (int)(-image_height / (1 * M_PI) * atanf(z4 / hori_dis) + image_height / 2);
 
         if (u >= 0 && u < image_width && v >= 0 && v < image_height) {
             float depth = sqrtf(x * x + y * y + z * z);
