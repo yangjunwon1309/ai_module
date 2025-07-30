@@ -85,7 +85,7 @@ clean: depth_camera/clean
 # Directory level rules for directory depth_camera
 
 # Recursive "all" directory target.
-depth_camera/all:
+depth_camera/all: depth_camera/CMakeFiles/depth_projector.dir/all
 
 .PHONY : depth_camera/all
 
@@ -95,6 +95,7 @@ depth_camera/preinstall:
 .PHONY : depth_camera/preinstall
 
 # Recursive "clean" directory target.
+depth_camera/clean: depth_camera/CMakeFiles/depth_projector.dir/clean
 depth_camera/clean: depth_camera/CMakeFiles/tf2_msgs_generate_messages_py.dir/clean
 depth_camera/clean: depth_camera/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/clean
 depth_camera/clean: depth_camera/CMakeFiles/actionlib_generate_messages_eus.dir/clean
@@ -374,7 +375,7 @@ gtest/googlemock/CMakeFiles/gmock_main.dir/all: gtest/googlemock/CMakeFiles/gmoc
 gtest/googlemock/CMakeFiles/gmock_main.dir/all: gtest/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/depend
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=5,6 "Built target gmock_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=7,8 "Built target gmock_main"
 .PHONY : gtest/googlemock/CMakeFiles/gmock_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -401,7 +402,7 @@ gtest/googlemock/CMakeFiles/gmock_main.dir/clean:
 gtest/googlemock/CMakeFiles/gmock.dir/all: gtest/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/depend
 	$(MAKE) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=3,4 "Built target gmock"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=5,6 "Built target gmock"
 .PHONY : gtest/googlemock/CMakeFiles/gmock.dir/all
 
 # Build rule for subdir invocation for target.
@@ -428,7 +429,7 @@ gtest/googlemock/CMakeFiles/gmock.dir/clean:
 gtest/googletest/CMakeFiles/gtest_main.dir/all: gtest/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest_main.dir/build.make gtest/googletest/CMakeFiles/gtest_main.dir/depend
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest_main.dir/build.make gtest/googletest/CMakeFiles/gtest_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=9,10 "Built target gtest_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=11,12 "Built target gtest_main"
 .PHONY : gtest/googletest/CMakeFiles/gtest_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -455,7 +456,7 @@ gtest/googletest/CMakeFiles/gtest_main.dir/clean:
 gtest/googletest/CMakeFiles/gtest.dir/all:
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest.dir/build.make gtest/googletest/CMakeFiles/gtest.dir/depend
 	$(MAKE) -f gtest/googletest/CMakeFiles/gtest.dir/build.make gtest/googletest/CMakeFiles/gtest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=7,8 "Built target gtest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=9,10 "Built target gtest"
 .PHONY : gtest/googletest/CMakeFiles/gtest.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1103,7 +1104,7 @@ dummy_vlm/CMakeFiles/geometry_msgs_generate_messages_eus.dir/clean:
 dummy_vlm/CMakeFiles/dummyVLM.dir/all:
 	$(MAKE) -f dummy_vlm/CMakeFiles/dummyVLM.dir/build.make dummy_vlm/CMakeFiles/dummyVLM.dir/depend
 	$(MAKE) -f dummy_vlm/CMakeFiles/dummyVLM.dir/build.make dummy_vlm/CMakeFiles/dummyVLM.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=1,2 "Built target dummyVLM"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=3,4 "Built target dummyVLM"
 .PHONY : dummy_vlm/CMakeFiles/dummyVLM.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1176,6 +1177,33 @@ roscpp_generate_messages_eus: dummy_vlm/CMakeFiles/roscpp_generate_messages_eus.
 dummy_vlm/CMakeFiles/roscpp_generate_messages_eus.dir/clean:
 	$(MAKE) -f dummy_vlm/CMakeFiles/roscpp_generate_messages_eus.dir/build.make dummy_vlm/CMakeFiles/roscpp_generate_messages_eus.dir/clean
 .PHONY : dummy_vlm/CMakeFiles/roscpp_generate_messages_eus.dir/clean
+
+#=============================================================================
+# Target rules for target depth_camera/CMakeFiles/depth_projector.dir
+
+# All Build rule for target.
+depth_camera/CMakeFiles/depth_projector.dir/all:
+	$(MAKE) -f depth_camera/CMakeFiles/depth_projector.dir/build.make depth_camera/CMakeFiles/depth_projector.dir/depend
+	$(MAKE) -f depth_camera/CMakeFiles/depth_projector.dir/build.make depth_camera/CMakeFiles/depth_projector.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles --progress-num=1,2 "Built target depth_projector"
+.PHONY : depth_camera/CMakeFiles/depth_projector.dir/all
+
+# Build rule for subdir invocation for target.
+depth_camera/CMakeFiles/depth_projector.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 depth_camera/CMakeFiles/depth_projector.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/junwon/CMU-VLA-Challenge/ai_module/build/CMakeFiles 0
+.PHONY : depth_camera/CMakeFiles/depth_projector.dir/rule
+
+# Convenience name for target.
+depth_projector: depth_camera/CMakeFiles/depth_projector.dir/rule
+
+.PHONY : depth_projector
+
+# clean rule for target.
+depth_camera/CMakeFiles/depth_projector.dir/clean:
+	$(MAKE) -f depth_camera/CMakeFiles/depth_projector.dir/build.make depth_camera/CMakeFiles/depth_projector.dir/clean
+.PHONY : depth_camera/CMakeFiles/depth_projector.dir/clean
 
 #=============================================================================
 # Target rules for target depth_camera/CMakeFiles/tf2_msgs_generate_messages_py.dir

@@ -623,6 +623,19 @@ roscpp_generate_messages_eus/fast:
 .PHONY : roscpp_generate_messages_eus/fast
 
 #=============================================================================
+# Target rules for targets named depth_projector
+
+# Build rule for target.
+depth_projector: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 depth_projector
+.PHONY : depth_projector
+
+# fast build rule for target.
+depth_projector/fast:
+	$(MAKE) -f depth_camera/CMakeFiles/depth_projector.dir/build.make depth_camera/CMakeFiles/depth_projector.dir/build
+.PHONY : depth_projector/fast
+
+#=============================================================================
 # Target rules for targets named tf2_msgs_generate_messages_py
 
 # Build rule for target.
@@ -865,6 +878,7 @@ help:
 	@echo "... dummyVLM"
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 	@echo "... roscpp_generate_messages_eus"
+	@echo "... depth_projector"
 	@echo "... tf2_msgs_generate_messages_py"
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... actionlib_generate_messages_eus"

@@ -80,6 +80,7 @@
 /home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/CMakeFiles/install.dir
 /home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/CMakeFiles/rebuild_cache.dir
 /home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/CMakeFiles/edit_cache.dir
+/home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/CMakeFiles/depth_projector.dir
 /home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/CMakeFiles/tf2_msgs_generate_messages_py.dir
 /home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir
 /home/junwon/CMU-VLA-Challenge/ai_module/build/depth_camera/CMakeFiles/actionlib_generate_messages_eus.dir
