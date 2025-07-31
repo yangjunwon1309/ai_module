@@ -4,6 +4,7 @@ from sensor_msgs.msg import Image, PointCloud2
 import sensor_msgs.point_cloud2 as pc2
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point32
+from std_msgs.msg import Header
 from std_msgs.msg import Int32MultiArray
 from cv_bridge import CvBridge
 import tf
@@ -114,7 +115,7 @@ class BoundingBox3DExtractor:
 
         cloud_data = [(x, y, z) for (x, y, z) in points_map]
         pc2_msg = pc2.create_cloud(header, fields, cloud_data)
-        point_pub.publish(pc2_msg)
+        self.pub.publish(pc2_msg)
 
 if __name__ == '__main__':
     try:
