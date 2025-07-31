@@ -4,6 +4,7 @@ from sensor_msgs.msg import Image, PointCloud2
 import sensor_msgs.point_cloud2 as pc2
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point32
+from std_msgs.msg import Int32MultiArray
 from cv_bridge import CvBridge
 import tf
 import math
@@ -13,7 +14,7 @@ class BoundingBox3DExtractor:
         rospy.init_node("bbox_3d_extractor")
         
         self.stack_num = 100
-        self.odom_stack = np.zeros((self.stack_num, 7))  # x, y, z, roll, pitch, yaw, time
+        self.odom_stack = np.zeros((self.stack_num, 8))  # x, y, z, x, y, z, w, time
         self.odom_id_pointer = -1
         self.image_id_pointer = 0
 
@@ -24,10 +25,10 @@ class BoundingBox3DExtractor:
 
         self.camera_offset_z = 0
 
-        self.bbox_sub = rospy.Subscriber("/bbox_pixel_range", PointCloud, self.bbox_callback)
+        self.bbox_sub = rospy.Subscriber("/bbox", Int32MultiArray, self.bbox_callback)
         self.depth_sub = rospy.Subscriber("/depth_camera", Image, self.depth_callback)
         self.pose_sub = rospy.Subscriber("/state_estimation", Odometry, self.odom_callback)
-        self.pub = rospy.Publisher("/bbox_points_map", PointCloud, queue_size=1)
+        self.pub = rospy.Publisher("/bbox_points", PointCloud2, queue_size=1)
     
     def depth_callback(self, msg):
         self.latest_depth = self.bridge.imgmsg_to_cv2(msg, desired_encoding="32FC1")
@@ -36,8 +37,6 @@ class BoundingBox3DExtractor:
     def odom_callback(self, msg):
         q = msg.pose.pose.orientation
         pos = msg.pose.pose.position
-
-        (r, p, y) = tf.transformations.euler_from_quaternion([])
 
         self.odom_id_pointer = (self.odom_id_pointer + 1) % self.stack_num
         self.odom_stack[self.odom_id_pointer] = [
@@ -91,7 +90,7 @@ class BoundingBox3DExtractor:
         min_diff = float("inf")
         image_id_pointer = -1
         for i in range(self.stack_num):
-            diff = abs(self.odom_stack[i][6] - self.image_time)
+            diff = abs(self.odom_stack[i][7] - self.image_time)
             if diff < min_diff:
                 min_diff = diff
                 image_id_pointer = i
