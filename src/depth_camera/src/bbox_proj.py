@@ -96,7 +96,6 @@ class BoundingBox3DExtractor:
                 image_id_pointer = i
 
         pos_ori = self.odom_stack[image_id_pointer]
-        ori = self.latest_pose.pose.pose.orientation
         trans = tf.transformations.translation_matrix([pos_ori[0], pos_ori[1], pos_ori[2] + self.camera_offset_z])
         rot = tf.transformations.quaternion_matrix([pos_ori[3], pos_ori[4], pos_ori[5], pos_ori[6]])
         T = np.dot(trans, rot)  
