@@ -190,11 +190,12 @@ install(TARGETS depth_projector
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
+install(
 #   # myfile1
 #   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+  DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 
 #############
 ## Testing ##
