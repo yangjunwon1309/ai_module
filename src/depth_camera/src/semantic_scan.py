@@ -82,14 +82,14 @@ def visualize_depth_overlay(rgb_image, depth_image):
     if np.max(depth_image) == 0:
         return rgb_image
     
-    depth_threshold = 7 #np.percentile(valid_depth, 95)
+    depth_threshold = np.percentile(valid_depth, 95) # 7 m
     clipped_depth = np.clip(depth_image, 0, depth_threshold)
     depth_mask = (depth_image > 0) & (depth_image <= depth_threshold)
 
     depth_colormap = cv2.applyColorMap(
         cv2.convertScaleAbs(depth_image, alpha=255.0 / depth_threshold), cv2.COLORMAP_JET
     )
-    
+
     overlay = rgb_image.copy()
     overlay[depth_mask] = cv2.addWeighted(rgb_image[depth_mask], 0.5, depth_colormap[depth_mask], 0.5, 0)
     return overlay
@@ -109,7 +109,7 @@ def process():
         return
 
     print(f"Trying to sync image_time={image_time:.3f}, odom_stack time={odom_stack[image_id_pointer][6]:.3f}")
-    
+
     min_diff = float("inf")
     best_index = -1
     for i in range(stack_num):
@@ -122,8 +122,8 @@ def process():
         print(f"Skipping: best odom sync diff too large ({min_diff:.3f}s)")
 
     image_id_pointer = best_index
-    print(f"Using odom[{image_id_pointer}] with time diff: {min_diff:.3f}s")
-    print("Running depth projection")
+    #print(f"Using odom[{image_id_pointer}] with time diff: {min_diff:.3f}s")
+    #print("Running depth projection")
 
 
     h, w = seg_image_cv.shape[:2]

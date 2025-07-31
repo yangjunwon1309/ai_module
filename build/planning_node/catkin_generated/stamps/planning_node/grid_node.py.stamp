@@ -35,11 +35,13 @@ class GridNodePublisher:
 
     def pose_callback(self, msg):
         if not self.received_pose:
-            self.origin = np.array([
-                msg.pose.pose.position.x,
-                msg.pose.pose.position.y,
-                msg.pose.pose.position.z
-            ])
+            # fixed origin
+            self.origin = np.array([0,0,0.75])
+            # np.array([
+            #     msg.pose.pose.position.x,
+            #     msg.pose.pose.position.y,
+            #     msg.pose.pose.position.z
+            # ])
             self.received_pose = True
             rospy.loginfo(f"Using initial origin from /state_estimation: {self.origin}")
 
