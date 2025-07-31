@@ -104,7 +104,7 @@ class BoundingBox3DExtractor:
         points_map = T @ points_cam
 
         header = Header()
-        header.stamp = stamp
+        header.stamp = rospy.Time.from_sec(self.image_time)
         header.frame_id = "map"
 
         fields = [
