@@ -26,7 +26,7 @@ class BoundingBox3DExtractor:
         self.camera_offset_z = 0
 
         self.bbox_sub = rospy.Subscriber("/bbox", Int32MultiArray, self.bbox_callback)
-        self.depth_sub = rospy.Subscriber("/depth_camera", Image, self.depth_callback)
+        self.depth_sub = rospy.Subscriber("/depth_image", Image, self.depth_callback)
         self.pose_sub = rospy.Subscriber("/state_estimation", Odometry, self.odom_callback)
         self.pub = rospy.Publisher("/bbox_points", PointCloud2, queue_size=1)
     
