@@ -1,7 +1,8 @@
 <launch>
  <!--
   <include pkg="depth_camera" file="depth_camera.launch"/>
+  <include pkg="planning_node"   file="planning_node.launch"/>
   -->
   <include file="$(find depth_camera)/launch/depth_camera.launch"/>
-  <include pkg="planning_node"   file="planning_node.launch"/>
+  <include file="$(find planning_node)/launch/planning_node.launch"/>
 </launch>
