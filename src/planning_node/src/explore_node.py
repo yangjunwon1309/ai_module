@@ -264,7 +264,7 @@ class ExplorationNode:
         os.makedirs(bag_dir, exist_ok=True)
         filepath = os.path.join(bag_dir, filename)
 
-        topics = ['/camera/image/compressed', '/state_estimation', '/object_markers', '/registered_scan']
+        topics = ['/camera/image/compressed', '/state_estimation', '/object_markers', '/registered_scan', '/depth_image', '/semantic_depth_image']
         command = ['rosbag', 'record', '-O', filepath] + topics
         self.bag_process = subprocess.Popen(command) #, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         rospy.loginfo("rosbag recording started.")
