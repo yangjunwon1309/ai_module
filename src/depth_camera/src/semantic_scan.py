@@ -82,6 +82,7 @@ def visualize_depth_overlay(rgb_image, depth_image):
     if np.max(depth_image) == 0:
         return rgb_image
     
+    valid_depth = depth_image[depth_image > 0]
     depth_threshold = np.percentile(valid_depth, 95) # 7 m
     clipped_depth = np.clip(depth_image, 0, depth_threshold)
     depth_mask = (depth_image > 0) & (depth_image <= depth_threshold)

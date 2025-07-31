@@ -163,7 +163,6 @@ set_target_properties(depth_projector PROPERTIES OUTPUT_NAME depth_projector PRE
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-   src/depth_camera.py
    src/semantic_scan.py
    src/bbox_proj.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
