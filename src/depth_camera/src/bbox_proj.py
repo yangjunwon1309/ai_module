@@ -1,6 +1,6 @@
 import rospy
 import numpy as np
-from sensor_msgs.msg import Image, PointCloud2
+from sensor_msgs.msg import Image, PointCloud2, PointField
 import sensor_msgs.point_cloud2 as pc2
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point32
@@ -79,7 +79,7 @@ class BoundingBox3DExtractor:
         image_height = self.latest_depth.shape[0]
 
         theta = math.pi - 2 * math.pi * u / image_width
-        phi = math.pi - 2 * math.pi * v / image_height
+        phi = math.pi/2 - 2 * math.pi * v / image_height
 
         X = d * np.cos(phi) * np.cos(theta)
         Y = d * np.cos(phi) * np.sin(theta)
@@ -91,6 +91,8 @@ class BoundingBox3DExtractor:
         min_diff = float("inf")
         image_id_pointer = -1
         for i in range(self.stack_num):
+            if self.odom_stack[i][7] == 0:
+                continue
             diff = abs(self.odom_stack[i][7] - self.image_time)
             if diff < min_diff:
                 min_diff = diff
@@ -113,13 +115,13 @@ class BoundingBox3DExtractor:
             PointField('z', 8, PointField.FLOAT32, 1),
         ]
 
-        cloud_data = [(x, y, z) for (x, y, z) in points_map]
+        cloud_data = list(zip(points_map[0], points_map[1], points_map[2]))
         pc2_msg = pc2.create_cloud(header, fields, cloud_data)
         self.pub.publish(pc2_msg)
 
 if __name__ == '__main__':
     try:
-        BoundingBox3DExtractor()
+        node = BoundingBox3DExtractor()
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
