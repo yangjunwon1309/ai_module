@@ -79,7 +79,7 @@ class BoundingBox3DExtractor:
         image_height = self.latest_depth.shape[0]
 
         theta = math.pi - 2 * math.pi * u / image_width
-        phi = math.pi/2 - 2 * math.pi * v / image_height
+        phi = math.pi/2 -  math.pi * v / image_height
 
         X = d * np.cos(phi) * np.cos(theta)
         Y = d * np.cos(phi) * np.sin(theta)
