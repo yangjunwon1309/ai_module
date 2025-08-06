@@ -1,0 +1,12 @@
+<launch>
+    <!-- depth camera -->
+    <node pkg="depth_camera" type="semantic_scan.py" name="depth_projector_py" output="screen">
+        <param name="use_sim_time" value="false"/>
+    </node>
+
+    <!-- bbox -->
+    <node pkg="depth_camera" type="bbox_proj.py" name="bbox_3d_extractor" output="screen">
+        <param name="use_sim_time" value="false"/>
+    </node>
+
+</launch>
