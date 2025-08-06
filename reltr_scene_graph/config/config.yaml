@@ -1,0 +1,7 @@
+image_topic: "/static_img_pub/image_raw/compressed"
+use_compressed: true
+weights: "$(find reltr_scene_graph)/checkpoints/checkpoint0149.pth"
+device: "cuda"
+confidence_thresh: 0.30                    
+topk_triplets: 10                          # 프레임당 최대 K개
+save_dir: "~/.ros/scene_graph_results"

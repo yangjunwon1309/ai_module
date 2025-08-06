@@ -1,0 +1,38 @@
+<launch>
+  <!-- === 사용자가 바꿔줄 수 있는 인자들 === -->
+  <!-- Unity/시뮬레이터가 실제로 내보내는 카메라 토픽
+       압축이면 .../compressed, Raw면 .../image_raw 같은 걸로! -->
+  <arg name="camera_topic" default="/camera/image/compressed" />
+  <arg name="use_compressed" default="true" />
+  <!-- rviz 같이 띄울지 여부 -->
+  <arg name="use_rviz" default="false" />
+
+  <!-- === 1) Unity/시뮬레이터, VLM 등 기존 시스템 === -->
+  <node name="unity_simulator_executable"
+        pkg="vla_bringup"
+        type="run_unity.sh"
+        output="screen"
+        respawn="false" />
+
+  <include file="$(find vehicle_simulator)/launch/system_unity.launch" />
+  <include file="$(find dummy_vlm)/launch/dummy_vlm.launch" />
+<!-- 
+  === 2) rviz 같이 띄우기 ===
+  <node pkg="rviz" type="rviz" name="rviz" if="$(arg use_rviz)" /> -->
+
+  <!-- === 3) RelTR SGG 노드  === -->
+  <node pkg="reltr_scene_graph"
+        type="reltr_sgg_node.py"
+        name="reltr_sgg_node"
+        output="screen">
+    <!-- 기본 파라미터 로드 -->
+    <rosparam file="$(find reltr_scene_graph)/config/config.yaml" command="load" />
+
+    <!-- 가중치 경로는 launch에서 확정(ROS가 $(find ...) 치환) -->
+    <param name="weights" value="$(find reltr_scene_graph)/checkpoints/checkpoint0149.pth"/>
+
+    <!-- 실제 카메라 토픽과 압축 여부를 인자로 덮어쓰기 -->
+    <param name="image_topic"    value="$(arg camera_topic)"/>
+    <param name="use_compressed" value="$(arg use_compressed)"/>
+  </node>
+</launch>

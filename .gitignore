@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+build/
+devel/
+logs/
+*.bag
+*.log
+.DS_Store
+reltr_scene_graph/checkpoints/*.pth
+reltr_scene_graph/checkpoints/*.pth
