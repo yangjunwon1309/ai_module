@@ -10,3 +10,4 @@ logs/
 .DS_Store
 reltr_scene_graph/checkpoints/*.pth
 reltr_scene_graph/checkpoints/*.pth
+*.bak
