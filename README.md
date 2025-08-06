@@ -1,4 +1,4 @@
-## Quick Start (ROS Noetic)
+## Quick Start - scene graph generation per frame(/camera/image/compressed)
 
 ```bash
 cd ~/catkin_ws/src
