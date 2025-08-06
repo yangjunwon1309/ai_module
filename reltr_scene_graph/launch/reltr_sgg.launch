@@ -1,0 +1,12 @@
+<launch>
+  <node pkg="reltr_scene_graph"
+        type="reltr_sgg_node.py"
+        name="reltr_sgg_node"
+        output="screen">
+    <rosparam file="$(find reltr_scene_graph)/config/config.yaml" command="load" />
+    <param name="weights" value="$(find reltr_scene_graph)/checkpoints/checkpoint0149.pth"/>
+    <param name="use_compressed" value="true"/>
+    <param name="image_topic" value="/camera/image/compressed"/>
+    <param name="use_compressed" value="true"/>
+  </node>
+</launch>

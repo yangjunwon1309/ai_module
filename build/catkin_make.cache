@@ -1,2 +1,0 @@
-depth_camera:dummy_vlm:planning_node
--DCATKIN_DEVEL_PREFIX=/home/junwon/CMU-VLA-Challenge/ai_module/devel -DCMAKE_INSTALL_PREFIX=/home/junwon/CMU-VLA-Challenge/ai_module/install -G Unix Makefiles

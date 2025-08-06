@@ -1,8 +1,0 @@
-prefix=/home/junwon/CMU-VLA-Challenge/ai_module/install
-
-Name: planning_node
-Description: Description of planning_node
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="reltr_scene_graph" type="reltr_scene_graph_node.py" name="reltr_scene_graph_node" output="screen">
+    <rosparam file="$(find reltr_scene_graph)/config/config.yaml" command="load" />
+  </node>
+</launch>

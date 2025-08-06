@@ -1,0 +1,11 @@
+<launch>
+    <node name="unity_simulator_executable"
+          pkg="vla_bringup"
+          type="run_unity.sh"
+          output="screen"
+          respawn="false" />
+
+    <include file="$(find vehicle_simulator)/launch/system_unity.launch" />
+
+    <include file="$(find dummy_vlm)/launch/dummy_vlm.launch" />
+</launch>
