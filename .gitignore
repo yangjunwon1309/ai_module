@@ -2,8 +2,6 @@ ai_module/build/
 ai_module/devel/
 /build/
 /devel/
-/data/*
-!data/
 /src/planning_node/src/data/*
 !/src/planning_node/src/data/
 
