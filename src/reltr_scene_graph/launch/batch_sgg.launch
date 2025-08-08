@@ -1,0 +1,21 @@
+<launch>
+  <!-- 1) save_dir 인자와 root_dir 인자 정의 (unchanged) -->
+  <arg name="save_dir"  default="$(env HOME)/catkin_ws/src/CMU-VLA-Challenge/ai_module/src/reltr_scene_graph/sgg/merged_sg"/>
+  <arg name="root_dir" default="$(env HOME)/catkin_ws/src/CMU-VLA-Challenge/ai_module/data"/>
+
+  <!-- weights 다운로드 노드 (unchanged) -->
+  <node pkg="reltr_scene_graph" type="get_weights.sh" name="get_weights" output="screen"/>
+
+  <!-- batch_sgg 실행 노드로 config.yaml 옮기기 -->
+  <node pkg="reltr_scene_graph" type="batch_sgg_node.py" name="batch_sgg" output="screen">
+    <!-- 2) config.yaml 은 private ns(~)로 로드 -->
+    <rosparam file="$(find reltr_scene_graph)/config/config.yaml"
+              command="load" ns="~"/>
+
+    <!-- 3) 그 다음에 네가 원하는 param 세팅 -->
+    <param name="device"           value="cuda"/>
+    <param name="root_dir"         value="$(arg root_dir)"/>
+    <param name="weights"          value="$(find reltr_scene_graph)/checkpoints/checkpoint0149.pth"/>
+    <param name="save_dir"         value="$(arg save_dir)"/>
+  </node>
+</launch>
