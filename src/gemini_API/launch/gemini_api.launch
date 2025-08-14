@@ -1,21 +1,8 @@
 <launch>
-    <!-- Argument to select the operating mode -->
-    <!-- 1: Image-only, Integer -->
-    <!-- 2: Image-only, Integer + Explanation -->
-    <!-- 3: Image + Scene Graph, Integer -->
-    <!-- 4: Image + Scene Graph, Integer + Explanation -->
-    <arg name="mode" default="1" doc="Set the operating mode for the numerical answer generator."/>
 
-    <!-- Node for answering numerical questions -->
-    <node pkg="gemini_api" type="answer_numerical.py" name="answer_numerical_node" output="screen"
-        launch-prefix="/home/yong/venvs/gemini310/bin/python">   <!-- please use different path of venv with python 3.10 or above -->
-        <param name="mode" value="$(arg mode)" />
+    <!-- Node for orchestrating the gemini_API scripts -->
+    <node pkg="gemini_API" type="orchestrator.py" name="gemini_orchestrator" output="screen"
+        launch-prefix="/home/yong/venvs/gemini310/bin/python">
     </node>
 
-    <!-- 
-    You may need to launch the dummy VLM node that publishes the question.
-    As you correctly pointed out, the type is the name of the executable.
-    Example (uncomment and adapt if needed):
-    <node pkg="dummy_vlm" type="dummyVLM" name="dummyVLM" output="screen" required="true"/>
-    -->
 </launch>
